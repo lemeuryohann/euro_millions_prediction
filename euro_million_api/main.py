@@ -24,7 +24,8 @@ def root():
     return {"message" : "Prediction Tirage Euro Million! We gonna be rich my friend"}
 
 @app.get("/items/{item_id}")
-async def read_combi(i)
+async def read_combi(i):
+    return 1
 
 @app.post('/api/predict')
 
