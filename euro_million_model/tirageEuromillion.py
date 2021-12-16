@@ -1,11 +1,7 @@
 from os import SCHED_OTHER
-import pandas as pd
 import numpy as np
 import random
 import csv
-
-# lecture du csv
-df  = pd.read_csv('EuroMillions_numbers.csv', sep=';')
 
 
 # Fonction qui génère un tirage random à une date donnée
@@ -17,7 +13,7 @@ def randomNumberList(date,a,b,c,d,e,f,g):
     return res
 
 
-def generateFalseTirage():
+def generateFalseTirage(df):
     for row in df.iterrows():
         # Initialisation des variables utiles
         same= 'true'
@@ -55,13 +51,10 @@ def generateFalseTirage():
     
         # On écrits les résultats dans le csv
         if (same=='false'):
-            with open('EuroMillions_numbers.csv', 'a', newline='', encoding='utf-8') as csvfile:
+            with open('../data/EuroMillions_numbers.csv', 'a', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile, delimiter=';')
                 writer.writerow(randomList)
                 writer.writerow(randomList1)
                 writer.writerow(randomList2)
                 writer.writerow(randomList3)
-
-        
-
-generateFalseTirage()
+    return df
