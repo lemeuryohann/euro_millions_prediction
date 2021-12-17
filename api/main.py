@@ -1,8 +1,9 @@
-import joblib #to save the model (not like pickel)
+# import joblib #to save the model (not like pickel)
 import re 
 from fastapi import FastAPI 
 from pydantic import BaseModel
-from typing import Optional 
+from typing import Optional
+import csv
 
 class combinaison(BaseModel):
     combi_id : str
@@ -43,5 +44,40 @@ def generate_combi():
     return "This combi is good"
 
 
-#@app.get('api/model') 
+@app.get('/api/model')
+
+def get_modele():
+    # Donne les infos sur le modèle ( métriques, nom de l'algo, param d'entrainement)
+    return "modèle"
+
+@app.put('/api/model')
+
+# data doit être de la forme :
+# {
+#   Date : date,
+#   N1 : int,
+#   N2 : int,
+#   N3 : int,
+#   N4 : int,
+#   N5 : int,
+#   E1 : int,
+#   E2 : int,
+#   gagnant: int,
+#   Gain : int
+# }
+
+def add_data(data):
+    tirage = [data.Date, data.N1, data.N2, data.N3, data.N4, data.N5, data.E1, data.E2, data.gagnant, data.gain]
+    # Ecriture dans le fichier des donnés passé en paramètre 
+    with open('../data/EuroMillions_numbers.csv', 'a', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile, delimiter=';')
+                writer.writerow(tirage)
+    return "donnée ajoutée"
+
+@app.post('/api/model/retrain')
+
+def retrain_modele():
+    # réentrainer le modèle avec les nouvelles données
+    return "modèle réentrainer"
+
 
