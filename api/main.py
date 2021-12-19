@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 import csv
+import joblib
 
 class combinaison(BaseModel):
     combi_id : str
@@ -19,14 +20,21 @@ class combinaison(BaseModel):
     
 app = FastAPI()
 
+model = joblib.load('chosen_model.joblib')
+
+def prediction_combi(model, combi):
+    label = model.predict([combi])[0]
+    combi_proba = model.predict_proba([combi])
+
+
 @app.get('/')
 
 def root():
     return {"message" : "Prediction Tirage Euro Million! We gonna be rich my friend"}
 
-@app.get("/items/{item_id}")
-async def read_combi(i):
-    return 1
+@app.get("/combinaisons/{combi_id}")
+async def read_combi(combi_id: int):
+    return {"combinaison_id" : combi_id}
 
 @app.post('/api/predict')
 
