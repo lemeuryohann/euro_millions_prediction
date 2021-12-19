@@ -20,6 +20,13 @@ import csv
 from preprocessing import *
 
 
+#unzipping the dataset csv
+
+import zipfile
+with zipfile.ZipFile("../data/dataset.zip", 'r') as zip_ref:
+    zip_ref.extractall("../data")
+
+
 
 h = 0.02  # step size in the mesh
 
@@ -43,16 +50,22 @@ classifiers = [
     GaussianProcessClassifier(1.0 * RBF(1.0)),
     DecisionTreeClassifier(max_depth=5),
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
-    MLPClassifier(alpha=1, max_iter=1000),
     AdaBoostClassifier(),
     GaussianNB(),
     QuadraticDiscriminantAnalysis(),
 ]
 
 
-df = pd.read_csv("data/EuroMillions_numbers.csv")
+df = pd.read_csv("../data/dataset/EuroMillions_numbers.csv", sep=";", date_parser=True)
 df = df.apply(preprocessor(df))
 
+def labelisation(row):
+    if row["Gain"] == 0:
+        return "perdu"
+    else :
+        return "win"
+    
+for row in df : df ["label"] = df.apply(lambda row: labelisation(row), axis = 1)
 
 #train-test split 
 X = df.drop('label', axis = 1)
@@ -64,4 +77,9 @@ print(X_train.shape)
 print(X_test.shape)
 print(y_train.shape)
 print(y_test.shape)
+
+#Train the dataset of various models written above and choose the more accurate
+
+
+#Load the model using joblib 
 

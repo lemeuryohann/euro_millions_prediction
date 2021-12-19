@@ -58,14 +58,6 @@ def generateFalseTirage(df):
                 writer.writerow(randomList3)
     return df
 
-
-#labelisation des données : combi perdante ou gagnante 
-def labelisation(row):
-    if row["Gain"] == 0:
-        return "perdu"
-    else :
-        return "win"
-    
 def encoding(df):
     le = preprocessing.LabelEncoder()
     for column_name in df.columns:
@@ -73,9 +65,9 @@ def encoding(df):
             df[column_name] = le.fit_transform(df[column_name])
         else:
             pass
-
+    return df 
 def preprocessor(df):
-    df ["label"] = df.apply(lambda row: labelisation(row), axis = 1)
+
     df = df.apply(encoding(df))
     df = generateFalseTirage(df)
 
