@@ -18,10 +18,8 @@ Predict model with FastAPI and panda.
  - Clone our git repo (more details below)
  - create or use your virtual environment set on python3
  - install the requirements.txt file
- - then on your terminal start your fast api app : uvicorn main:app --reload (make sure you are working in the right directory:api )
+ - then on your terminal start your fast api app : uvicorn main:app --reload (make sure you are working in the right directory:api)
  - on your local host : http://127.0.0.1:8000/docs you should be able to view all our app features
-<<<<<<< HEAD
+
+
  
-=======
- 
->>>>>>> f817a19ea7c3f246624d78d0bbf30fbac1708376
