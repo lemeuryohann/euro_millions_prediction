@@ -3,69 +3,56 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import make_moons, make_circles, make_classification
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn import preprocessing
-from os import SCHED_OTHER
+from sklearn import metrics
 import random
 import csv
-from preprocessing import *
+#from generateLosingCombi import *
 
-
-#unzipping the dataset csv
-
-import zipfile
-with zipfile.ZipFile("../data/dataset.zip", 'r') as zip_ref:
-    zip_ref.extractall("../data")
-
-
-
-h = 0.02  # step size in the mesh
+#list of models to train on our dataset and then choose the more accurate
 
 names = [
-    "Nearest Neighbors",
-    "Linear SVM",
-    "RBF SVM",
     "Gaussian Process",
     "Decision Tree",
     "Random Forest",
-    "Neural Net",
-    "AdaBoost",
     "Naive Bayes",
-    "QDA",
 ]
 
 classifiers = [
-    KNeighborsClassifier(3),
-    SVC(kernel="linear", C=0.025),
-    SVC(gamma=2, C=1),
-    GaussianProcessClassifier(1.0 * RBF(1.0)),
+    GaussianProcessClassifier(),
     DecisionTreeClassifier(max_depth=5),
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
-    AdaBoostClassifier(),
     GaussianNB(),
-    QuadraticDiscriminantAnalysis(),
 ]
 
 
-df = pd.read_csv("../data/dataset/EuroMillions_numbers.csv", sep=";", date_parser=True)
-df = df.apply(preprocessor(df))
+df = pd.read_csv("../data/EuroMillions_numbersComplete.csv", sep=",")
 
+#labelisation des données : combi perdante ou gagnante 
 def labelisation(row):
     if row["Gain"] == 0:
         return "perdu"
     else :
         return "win"
     
-for row in df : df ["label"] = df.apply(lambda row: labelisation(row), axis = 1)
+df ["label"] = df.apply(lambda row: labelisation(row), axis = 1)
+print(df.head())
+print(df.dtypes)
+
+le = preprocessing.LabelEncoder()
+
+for column_name in df.columns:
+    if df[column_name].dtype == object:
+        df[column_name] = le.fit_transform(df[column_name])
+    else:
+        pass
+
 
 #train-test split 
 X = df.drop('label', axis = 1)
@@ -81,5 +68,26 @@ print(y_test.shape)
 #Train the dataset of various models written above and choose the more accurate
 
 
-#Load the model using joblib 
+from sklearn.metrics import classification_report, accuracy_score
+for name, classifier in zip(names, classifiers):
+    classifier.fit(X_train, y_train)
+    score = classifier.score(X_test, y_test)
+    print(name, score)
+    y_pred = classifier.predict(X_test)
+    print(classification_report(y_test,y_pred))
+    print('Accuracy: {} %'.format(100*accuracy_score(y_test, y_pred)))
+
+chosenClf = GaussianProcessClassifier()
+chosenClf.fit(X_train, y_train)
+
+#Load the model using pickle 
+
+# We found that the gaussian process is the most accurate and has more precision ! 
+# Let's load the gaussian classifier with pickle 
+
+import pickle
+filename= "saved_model.sav"
+pickle.dump(chosenClf, open(filename, 'wb'))
+
+
 
