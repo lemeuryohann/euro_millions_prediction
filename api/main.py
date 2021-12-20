@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 import csv
-import joblib
+import pickle
 
 class combinaison(BaseModel):
     combi_id : str
@@ -20,12 +20,14 @@ class combinaison(BaseModel):
     
 app = FastAPI()
 
-model = joblib.load('chosen_model.joblib')
+filename_Model= "../model/saved_model.sav"
+loaded_model = pickle.load(open(filename_Model,'rb'))
 
-def prediction_combi(model, combi):
-    label = model.predict([combi])[0]
-    combi_proba = model.predict_proba([combi])
+def prediction_combi(combi):
+    label = loaded_model.predict([combi])[0]
+    combi_proba = loaded_model.predict_proba([combi])
 
+    return {'label': label, 'winning_proba':combi_proba[0][1]}
 
 @app.get('/')
 
@@ -36,11 +38,11 @@ def root():
 async def read_combi(combi_id: int):
     return {"combinaison_id" : combi_id}
 
-@app.post('/api/predict')
+@app.get('/api/predict')
 
-def get_prediction():
+async def get_prediction(combi : combinaison):
     #Donne la proba pour que la combi d'entrée soit gagnante
-    return "proba gain + proba perte"
+    return prediction_combi(combi)
 
 
 
